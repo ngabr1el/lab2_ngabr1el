@@ -42,3 +42,14 @@ print("Formative points:", formative_points)
 print("Summative points:", summative_points)
 print("Total grade:", total_grade)
 print("GPA:", gpa)
+
+
+formative_percent = formative_points / 60 * 100
+summative_percent = summative_points / 40 * 100
+print("Formative percent:", formative_percent)
+print("Summative percent:", summative_percent)
+
+if formative_percent >= 50 and summative_percent >= 50:
+    print("Final status: PASSED")
+else:
+    print("Final status: FAILED")
