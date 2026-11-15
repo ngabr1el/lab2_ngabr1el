@@ -1,5 +1,7 @@
 import csv
 
+failed_names = []
+failed_weights = []
 formative_weight = 0
 summative_weight = 0
 formative_points = 0
@@ -18,6 +20,9 @@ with open("grades.csv", newline="") as f:
         if row["group"] == "Formative":
             formative_weight = formative_weight + weight
             formative_points = formative_points + points
+            if score < 50:
+                failed_names.append(row["assignment"])
+                failed_weights.append(weight)
         elif row["group"] == "Summative":
             summative_weight = summative_weight + weight
             summative_points = summative_points + points
@@ -53,3 +58,13 @@ if formative_percent >= 50 and summative_percent >= 50:
     print("Final status: PASSED")
 else:
     print("Final status: FAILED")
+
+
+if len(failed_names) == 0:
+    print("No formative assignments to resubmit.")
+else:
+    highest = max(failed_weights)
+    print("Eligible for resubmission:")
+    for i in range(len(failed_names)):
+        if failed_weights[i] == highest:
+            print("-", failed_names[i])
