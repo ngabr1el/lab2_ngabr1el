@@ -18,6 +18,7 @@ if os.path.getsize(filename) == 0:
 
 failed_names = []
 failed_weights = []
+errors = []
 formative_weight = 0
 summative_weight = 0
 formative_points = 0
@@ -26,8 +27,18 @@ summative_points = 0
 with open(filename, newline="") as f:
     reader = csv.DictReader(f)
     for row in reader:
-        score = float(row["score"])
-        weight = float(row["weight"])
+        name = row["assignment"]
+        if name is None or name.strip() == "":
+            print("Skipping row on line", reader.line_num, "because it is empty or has no assignment name.")
+            continue
+
+        try:
+            score = float(row["score"])
+            weight = float(row["weight"])
+        except (ValueError, TypeError):
+            errors.append("Line " + str(reader.line_num) + " (" + name + "): score and weight must be numbers, for example 85 and 20.")
+            continue
+
         points = score * weight / 100
 
         if score < 0 or score > 100:
@@ -44,6 +55,11 @@ with open(filename, newline="") as f:
             summative_points = summative_points + points
         else:
             print("Unknown group for", row["assignment"], ":", row["group"])
+if len(errors) > 0:
+    print("Problems found in", filename, ":")
+    for message in errors:
+        print("-", message)
+    sys.exit()
 
 total_weight = formative_weight + summative_weight
 print("Formative weight:", formative_weight)
