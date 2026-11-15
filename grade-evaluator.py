@@ -42,7 +42,8 @@ with open(filename, newline="") as f:
         points = score * weight / 100
 
         if score < 0 or score > 100:
-            print("Invalid score for", row["assignment"], ":", score)
+            errors.append("Line " + str(reader.line_num) + " (" + name + "): score " + row["score"] + " must be between 0 and 100, for example 85.")
+            continue
 
         if row["group"] == "Formative":
             formative_weight = formative_weight + weight
@@ -54,24 +55,25 @@ with open(filename, newline="") as f:
             summative_weight = summative_weight + weight
             summative_points = summative_points + points
         else:
-            print("Unknown group for", row["assignment"], ":", row["group"])
+            errors.append("Line " + str(reader.line_num) + " (" + name + "): group must be Formative or Summative, but it is '" + row["group"] + "'.")
+
+
+total_weight = formative_weight + summative_weight
+if len(errors) == 0:
+    if formative_weight != 60:
+        errors.append("Formative weights must add up to 60, but they add up to " + str(formative_weight) + ".")
+    if summative_weight != 40:
+        errors.append("Summative weights must add up to 40, but they add up to " + str(summative_weight) + ".")
+    if total_weight != 100:
+        errors.append("The total weight must be exactly 100, but it is " + str(total_weight) + ".")
+
 if len(errors) > 0:
-    print("Problems found in", filename, ":")
+    print("Cannot generate the transcript. Problems found in", filename, ":")
     for message in errors:
         print("-", message)
     sys.exit()
 
-total_weight = formative_weight + summative_weight
-print("Formative weight:", formative_weight)
-print("Summative weight:", summative_weight)
-print("Total weight:", total_weight)
 
-if formative_weight != 60:
-    print("Error: Formative weights must add up to 60, but they add up to", formative_weight)
-if summative_weight != 40:
-    print("Error: Summative weights must add up to 40, but they add up to", summative_weight)
-if total_weight != 100:
-    print("Error: Total weight must be exactly 100, but it is", total_weight)
 
 total_grade = formative_points + summative_points
 gpa = (total_grade / 100) * 5.0
