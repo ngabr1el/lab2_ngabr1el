@@ -1,4 +1,20 @@
 import csv
+import os
+import sys
+
+filename = input("Enter the name of the CSV file (e.g., grades.csv): ").strip()
+if filename == "":
+    filename = "grades.csv"
+
+if not os.path.exists(filename):
+    print("Error: the file", filename, "was not found.")
+    print("Make sure it is in the same folder as this program and the name is spelled correctly (e.g., grades.csv).")
+    sys.exit()
+
+if os.path.getsize(filename) == 0:
+    print("Error: the file", filename, "is empty.")
+    print("It should start with a header row (e.g., assignment,group,score,weight) followed by your grades.")
+    sys.exit()
 
 failed_names = []
 failed_weights = []
@@ -7,7 +23,7 @@ summative_weight = 0
 formative_points = 0
 summative_points = 0
 
-with open("grades.csv", newline="") as f:
+with open(filename, newline="") as f:
     reader = csv.DictReader(f)
     for row in reader:
         score = float(row["score"])
