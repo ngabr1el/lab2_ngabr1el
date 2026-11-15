@@ -19,6 +19,7 @@ if os.path.getsize(filename) == 0:
 failed_names = []
 failed_weights = []
 errors = []
+transcript_lines = []
 formative_weight = 0
 summative_weight = 0
 formative_points = 0
@@ -57,8 +58,9 @@ with open(filename, newline="") as f:
         else:
             errors.append("Line " + str(reader.line_num) + " (" + name + "): group must be Formative or Summative, but it is '" + row["group"] + "'.")
 
-
+        transcript_lines.append(name.ljust(38) + row["group"].ljust(12) + str(score).rjust(7) + str(weight).rjust(8) + str(round(points, 2)).rjust(8))
 total_weight = formative_weight + summative_weight
+
 if len(errors) == 0:
     if formative_weight != 60:
         errors.append("Formative weights must add up to 60, but they add up to " + str(formative_weight) + ".")
@@ -74,26 +76,31 @@ if len(errors) > 0:
     sys.exit()
 
 
-
 total_grade = formative_points + summative_points
 gpa = (total_grade / 100) * 5.0
-print("Formative points:", formative_points)
-print("Summative points:", summative_points)
-print("Total grade:", total_grade)
-print("GPA:", gpa)
-
-
 formative_percent = formative_points / 60 * 100
 summative_percent = summative_points / 40 * 100
-print("Formative percent:", formative_percent)
-print("Summative percent:", summative_percent)
+
+print("")
+print("=" * 73)
+print("AFRICAN LEADERSHIP UNIVERSITY - STUDENT TRANSCRIPT")
+print("=" * 73)
+print("Assignment".ljust(38) + "Group".ljust(12) + "Score".rjust(7) + "Weight".rjust(8) + "Points".rjust(8))
+print("-" * 73)
+for line in transcript_lines:
+    print(line)
+print("-" * 73)
+print("Formative:", round(formative_points, 2), "/ 60 (" + str(round(formative_percent, 1)) + "%)")
+print("Summative:", round(summative_points, 2), "/ 40 (" + str(round(summative_percent, 1)) + "%)")
+print("Total grade:", round(total_grade, 2), "/ 100")
+print("GPA:", round(gpa, 2), "/ 5.0")
 
 if formative_percent >= 50 and summative_percent >= 50:
     print("Final status: PASSED")
 else:
     print("Final status: FAILED")
 
-
+print("-" * 73)
 if len(failed_names) == 0:
     print("No formative assignments to resubmit.")
 else:
@@ -102,3 +109,4 @@ else:
     for i in range(len(failed_names)):
         if failed_weights[i] == highest:
             print("-", failed_names[i])
+print("=" * 73)
